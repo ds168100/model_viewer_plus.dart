@@ -22,6 +22,7 @@ abstract class HTMLBuilder {
       final String? iosSrc}) {
     final html = StringBuffer(htmlTemplate);
     html.write('<model-viewer');
+    html.write(' id="model"');
     html.write(' src="${htmlEscape.convert(src)}"');
     html.write(
         ' style="background-color: rgb(${backgroundColor.red}, ${backgroundColor.green}, ${backgroundColor.blue});"');
@@ -74,7 +75,13 @@ abstract class HTMLBuilder {
     // TODO: reveal
     // TODO: shadow-intensity
     // TODO: shadow-softness
-    html.writeln('></model-viewer>');
+
+    html.write('><section>');
+    html.write(' <center><b>Inspection Type:</b> <select id="variant"></select></center>');
+    html.write('</section>');
+    html.writeln('</model-viewer>');
+
     return html.toString();
   }
 }
+

@@ -220,6 +220,18 @@ class _ModelViewerState extends State<ModelViewer> {
           await response.close();
           break;
 
+        case '/variant-list.js':
+          final code = await _readAsset(
+              'packages/model_viewer_plus/etc/assets/variant-list.js');
+          response
+            ..statusCode = HttpStatus.ok
+            ..headers
+                .add("Content-Type", "application/javascript;charset=UTF-8")
+            ..headers.add("Content-Length", code.lengthInBytes.toString())
+            ..add(code);
+          await response.close();
+          break;
+
         case '/model':
           if (url.isAbsolute && !url.isScheme("file")) {
             await response.redirect(url); // TODO: proxy the resource

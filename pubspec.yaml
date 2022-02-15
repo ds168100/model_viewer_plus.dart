@@ -22,3 +22,4 @@ flutter:
   assets:
     - etc/assets/template.html
     - etc/assets/model-viewer.js
+    - etc/assets/variant-list.js
