@@ -19,5 +19,8 @@ environment:
 flutter:
   uses-material-design: true
   assets:
-    - assets/Astronaut.glb
+    - etc/assets/Astronaut.glb
+    - etc/assets/MaterialsVariantsShoe.glb
+    - etc/assets/shoe.gltf
+    - etc/assets/EC_Pipes.gltf
 publish_to: none
