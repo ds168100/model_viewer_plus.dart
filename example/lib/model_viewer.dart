@@ -23,6 +23,13 @@ class _ModelViewPageState extends State<ModelViewPage>{
 
   @override
   Widget build(BuildContext context) {
+    List<TextureVariants> testTextures = [];
+    testTextures.add(TextureVariants(name: "Lines", path: "etc/assets/textures/splash_background.jpg"));
+    testTextures.add(TextureVariants(name: "Beach", path: "etc/assets/textures/diffuseBeach.jpg"));
+    testTextures.add(TextureVariants(name: "Midnight", path: "etc/assets/textures/diffuseMidnight.jpg"));
+    testTextures.add(TextureVariants(name: "Street", path: "etc/assets/textures/diffuseStreet.jpg"));
+    testTextures.add(TextureVariants(name: "Trippy", path: "etc/assets/textures/occlusionRougnessMetalness.jpg"));
+
     return Scaffold(
       appBar: AppBar(title: Text("Model Viewer")),
       body: ModelViewer(
@@ -31,8 +38,9 @@ class _ModelViewPageState extends State<ModelViewPage>{
         src: pathToModel, // a bundled asset file
         alt: "A shoe.",
         ar: false,
-        autoRotate: true,
+        autoRotate: false,
         cameraControls: true,
+        textures: testTextures,
       ),
     );
   }

@@ -23,4 +23,5 @@ flutter:
     - etc/assets/MaterialsVariantsShoe.glb
     - etc/assets/shoe.gltf
     - etc/assets/EC_Pipes.gltf
+    - etc/assets/textures/
 publish_to: none

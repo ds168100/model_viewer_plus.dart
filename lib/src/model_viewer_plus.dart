@@ -14,6 +14,26 @@ import 'package:webview_flutter/webview_flutter.dart';
 
 import 'html_builder.dart';
 
+class TextureVariants{
+  TextureVariants({
+    this.name = "Texutre Name",
+    this.path = "Path to texture",
+  });
+  String name;
+  String path;
+
+  factory TextureVariants.fromJson(Map<String, dynamic> json) => TextureVariants(
+    name: json["name"],
+    path: json["path"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "name": name,
+    "path": path
+  };
+}
+
+
 /// Flutter widget for rendering interactive 3D models.
 class ModelViewer extends StatefulWidget {
   ModelViewer(
@@ -28,7 +48,9 @@ class ModelViewer extends StatefulWidget {
       this.autoRotateDelay,
       this.autoPlay,
       this.cameraControls,
-      this.iosSrc})
+      this.iosSrc,
+      required this.textures,
+      })
       : super(key: key);
 
   /// The background color for the model viewer.
@@ -84,6 +106,8 @@ class ModelViewer extends StatefulWidget {
   /// The URL to a USDZ model which will be used on supported iOS 12+ devices
   /// via AR Quick Look.
   final String? iosSrc;
+
+  final List<TextureVariants> textures;
 
   @override
   State<ModelViewer> createState() => _ModelViewerState();
@@ -170,6 +194,10 @@ class _ModelViewerState extends State<ModelViewer> {
   }
 
   String _buildHTML(final String htmlTemplate) {
+    List<String> textureNames = [];
+    for(var element in widget.textures){
+      textureNames.add(element.name);
+    }
     return HTMLBuilder.build(
       htmlTemplate: htmlTemplate,
       backgroundColor: widget.backgroundColor,
@@ -182,12 +210,14 @@ class _ModelViewerState extends State<ModelViewer> {
       autoRotateDelay: widget.autoRotateDelay,
       autoPlay: widget.autoPlay,
       cameraControls: widget.cameraControls,
+      textures: textureNames,
       iosSrc: widget.iosSrc,
     );
   }
 
   Future<void> _initProxy() async {
     final url = Uri.parse(widget.src);
+
     _proxy = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
     _proxy!.listen((final HttpRequest request) async {
       //print("${request.method} ${request.uri}"); // DEBUG
@@ -220,6 +250,18 @@ class _ModelViewerState extends State<ModelViewer> {
           await response.close();
           break;
 
+        case '/external-list.js':
+          final code = await _readAsset(
+              'packages/model_viewer_plus/etc/assets/external-list.js');
+          response
+            ..statusCode = HttpStatus.ok
+            ..headers
+                .add("Content-Type", "application/javascript;charset=UTF-8")
+            ..headers.add("Content-Length", code.lengthInBytes.toString())
+            ..add(code);
+          await response.close();
+          break;
+
         case '/variant-list.js':
           final code = await _readAsset(
               'packages/model_viewer_plus/etc/assets/variant-list.js');
@@ -232,7 +274,20 @@ class _ModelViewerState extends State<ModelViewer> {
           await response.close();
           break;
 
+        case '/additionalTextures.json':
+          final code = await _readAsset(
+              'packages/model_viewer_plus/etc/assets/additionalTextures.json');
+          response
+            ..statusCode = HttpStatus.ok
+            ..headers
+                .add("Content-Type", "application/json;charset=UTF-8")
+            ..headers.add("Content-Length", code.lengthInBytes.toString())
+            ..add(code);
+          await response.close();
+          break;
+
         case '/model':
+          print(url);
           if (url.isAbsolute && !url.isScheme("file")) {
             await response.redirect(url); // TODO: proxy the resource
           } else {
@@ -251,13 +306,37 @@ class _ModelViewerState extends State<ModelViewer> {
 
         case '/favicon.ico':
         default:
-          final text = utf8.encode("Resource '${request.uri}' not found");
-          response
-            ..statusCode = HttpStatus.notFound
-            ..headers.add("Content-Type", "text/plain;charset=UTF-8")
-            ..headers.add("Content-Length", text.length.toString())
-            ..add(text);
-          await response.close();
+        var defaultURL = request.uri.toString();
+          if(defaultURL.contains("textures/")){
+            var stringPos = defaultURL.lastIndexOf('/');
+            var result = (stringPos != -1)? defaultURL.substring((stringPos + 1), defaultURL.length): defaultURL;
+            var pos = int.parse(result);
+            var textureURL = widget.textures[pos].path;
+            var textureURI = Uri.parse(textureURL);
+
+            if (textureURI.isAbsolute && !textureURI.isScheme("file")) {
+              await response.redirect(textureURI); // TODO: proxy the resource
+            } else {
+              final data = await (textureURI.isScheme("file")
+                  ? _readFile(textureURI.path)
+                  : _readAsset(textureURI.path));
+              response
+                ..statusCode = HttpStatus.ok
+                ..headers.add("Content-Type", "image/png")
+                ..headers.add("Content-Length", data.lengthInBytes.toString())
+                ..headers.add("Access-Control-Allow-Origin", "*")
+                ..add(data);
+              await response.close();
+            }
+          }else{
+            final text = utf8.encode("Resource '${request.uri}' not found");
+            response
+              ..statusCode = HttpStatus.notFound
+              ..headers.add("Content-Type", "text/plain;charset=UTF-8")
+              ..headers.add("Content-Length", text.length.toString())
+              ..add(text);
+            await response.close();
+          }
           break;
       }
     });

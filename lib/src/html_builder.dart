@@ -18,7 +18,9 @@ abstract class HTMLBuilder {
       final bool? autoRotate,
       final int? autoRotateDelay,
       final bool? autoPlay,
+      final List<String>? textures,
       final bool? cameraControls,
+
       final String? iosSrc}) {
     final html = StringBuffer(htmlTemplate);
     html.write('<model-viewer');
@@ -76,8 +78,16 @@ abstract class HTMLBuilder {
     // TODO: shadow-intensity
     // TODO: shadow-softness
 
+
     html.write('><section>');
-    html.write(' <center><b>Inspection Type:</b> <select id="variant"></select></center>');
+    //html.write(' <center><b>Inspection Type:</b> <select id="variant"></select></center>');
+    html.write('<center><select id="variant">');
+    html.write('<option value="Default">Default</option>');
+    for(var i=0; i<textures!.length; i++){
+      var newOption = '<option value="textures/${i}">${textures[i]}</option>';
+      html.write(newOption);
+    }
+    html.write('</select></center>');
     html.write('</section>');
     html.writeln('</model-viewer>');
 

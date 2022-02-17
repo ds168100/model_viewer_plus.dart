@@ -1,0 +1,22 @@
+[
+    {
+        "name": "Lines",
+        "path": "textures/splash_background.jpg"
+    },
+    {
+        "name": "Beach",
+        "path": "textures/diffuseBeach.jpg"
+    },
+    {
+        "name": "Midnight",
+        "path": "textures/diffuseMidnight.jpg"
+    },
+    {
+        "name": "Street",
+        "path": "textures/diffuseStreet.jpg"
+    },
+    {
+        "name": "Trippy",
+        "path": "textures/occlusionRougnessMetalness.jpg"
+    }
+]
