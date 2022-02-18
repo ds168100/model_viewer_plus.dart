@@ -274,6 +274,18 @@ class _ModelViewerState extends State<ModelViewer> {
           await response.close();
           break;
 
+        case '/panningScript.js':
+          final code = await _readAsset(
+              'packages/model_viewer_plus/etc/assets/panningScript.js');
+          response
+            ..statusCode = HttpStatus.ok
+            ..headers
+                .add("Content-Type", "application/javascript;charset=UTF-8")
+            ..headers.add("Content-Length", code.lengthInBytes.toString())
+            ..add(code);
+          await response.close();
+          break;
+
         case '/additionalTextures.json':
           final code = await _readAsset(
               'packages/model_viewer_plus/etc/assets/additionalTextures.json');
@@ -287,7 +299,6 @@ class _ModelViewerState extends State<ModelViewer> {
           break;
 
         case '/model':
-          print(url);
           if (url.isAbsolute && !url.isScheme("file")) {
             await response.redirect(url); // TODO: proxy the resource
           } else {

@@ -1,6 +1,5 @@
 const modelViewerTexture = document.querySelector("model-viewer#model");
     modelViewerTexture.addEventListener("load", () => {
-      console.log('Loaded Model Viewer!')
       const material = modelViewerTexture.model.materials[0];
       const saveTexture = material.pbrMetallicRoughness['baseColorTexture'].texture;
       const input = document.querySelector('#variant');
@@ -12,14 +11,11 @@ const modelViewerTexture = document.querySelector("model-viewer#model");
         } else {
           material[channel].setTexture(texture);
         }
-        console.log("Texture should be different!");
       }
 
       input.addEventListener('change', () => {
         var d = input.value;
-        console.log(d);
         if(d.includes('Default')){
-          console.log('Reset Material!');
           material.pbrMetallicRoughness['baseColorTexture'].setTexture(saveTexture);
         }else{
           createAndApplyTexture('baseColorTexture', d);

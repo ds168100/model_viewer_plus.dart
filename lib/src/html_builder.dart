@@ -78,8 +78,9 @@ abstract class HTMLBuilder {
     // TODO: shadow-intensity
     // TODO: shadow-softness
 
-
-    html.write('><section>');
+    html.writeln('></model-viewer>');
+    html.write('<section>');
+    //html.write('><section>');
     //html.write(' <center><b>Inspection Type:</b> <select id="variant"></select></center>');
     html.write('<center><select id="variant">');
     html.write('<option value="Default">Default</option>');
@@ -89,7 +90,7 @@ abstract class HTMLBuilder {
     }
     html.write('</select></center>');
     html.write('</section>');
-    html.writeln('</model-viewer>');
+    //html.writeln('</model-viewer>');
 
     return html.toString();
   }

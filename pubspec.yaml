@@ -24,3 +24,4 @@ flutter:
     - etc/assets/model-viewer.js
     - etc/assets/variant-list.js
     - etc/assets/external-list.js
+    - etc/assets/panningScript.js
