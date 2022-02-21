@@ -1,8 +1,6 @@
-const modelViewerTexture = document.querySelector("model-viewer#model");
-    modelViewerTexture.addEventListener("load", () => {
-      const material = modelViewerTexture.model.materials[0];
-      const saveTexture = material.pbrMetallicRoughness['baseColorTexture'].texture;
-      const input = document.querySelector('#variant');
+let material;
+let saveTexture;
+let input;
 
       const createAndApplyTexture = async (channel, file) => {
         const texture = await modelViewerTexture.createTexture(file);
@@ -13,14 +11,23 @@ const modelViewerTexture = document.querySelector("model-viewer#model");
         }
       }
 
-      input.addEventListener('change', () => {
-        var d = input.value;
-        if(d.includes('Default')){
-          material.pbrMetallicRoughness['baseColorTexture'].setTexture(saveTexture);
-        }else{
-          createAndApplyTexture('baseColorTexture', d);
-        }
+      function changeTexture(changeValue){
+      if(changeValue.includes('Default')){
+        material.pbrMetallicRoughness['baseColorTexture'].setTexture(saveTexture);
+      }else{
+        createAndApplyTexture('baseColorTexture', changeValue);
+       }
+      }
 
+const modelViewerTexture = document.querySelector("model-viewer#model");
+    modelViewerTexture.addEventListener("load", () => {
+     material = modelViewerTexture.model.materials[0];
+     saveTexture = material.pbrMetallicRoughness['baseColorTexture'].texture;
+     input = document.querySelector('#variant');
+
+      input.addEventListener('change', () => {
+        console.log(input.value);
+        changeTexture(input.value);
       });
 
       /*
