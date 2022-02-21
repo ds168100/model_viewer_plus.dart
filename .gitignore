@@ -13,4 +13,4 @@
 build/
 pubspec.lock
 
-example/etc/assets/EC_Pipes.gltf
+example/assets/EC_Pipes.gltf
