@@ -68,17 +68,14 @@ class ModelViewerState extends State<ModelViewer> {
         try {
           // See: https://developers.google.com/ar/develop/java/scene-viewer
           final intent = android_content.AndroidIntent(
-            action: "android.intent.action.VIEW",
-            // Intent.ACTION_VIEW
+            action: "android.intent.action.VIEW", // Intent.ACTION_VIEW
             data: "https://arvr.google.com/scene-viewer/1.0",
-            arguments: <String, dynamic>{
+            arguments:  <String, dynamic>{
               'file': widget.src,
               'mode': 'ar_only',
             },
             package: "com.google.ar.core",
-            flags: <int>[
-              Flag.FLAG_ACTIVITY_NEW_TASK
-            ], // Intent.FLAG_ACTIVITY_NEW_TASK,
+            flags: <int>[Flag.FLAG_ACTIVITY_NEW_TASK],// Intent.FLAG_ACTIVITY_NEW_TASK,
           );
           await intent.launch();
         } catch (error) {
@@ -94,13 +91,16 @@ class ModelViewerState extends State<ModelViewer> {
       },
       onWebResourceError: (final WebResourceError error) {
         print(
-            '>>>> ModelViewer failed to load: ${error.description} (${error
-                .errorType} ${error.errorCode})'); // DEBUG
+            '>>>> ModelViewer failed to load: ${error.description} (${error.errorType} ${error.errorCode})'); // DEBUG
       },
     );
   }
 
   String _buildHTML(final String htmlTemplate) {
+    List<String> textureNames = [];
+    for(var element in widget.textures){
+      textureNames.add(element.name);
+    }
     return HTMLBuilder.build(
       htmlTemplate: htmlTemplate,
       backgroundColor: widget.backgroundColor,
@@ -113,12 +113,14 @@ class ModelViewerState extends State<ModelViewer> {
       autoRotateDelay: widget.autoRotateDelay,
       autoPlay: widget.autoPlay,
       cameraControls: widget.cameraControls,
+      textures: textureNames,
       iosSrc: widget.iosSrc,
     );
   }
 
   Future<void> _initProxy() async {
     final url = Uri.parse(widget.src);
+
     _proxy = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
     _proxy!.listen((final HttpRequest request) async {
       //print("${request.method} ${request.uri}"); // DEBUG
@@ -129,8 +131,7 @@ class ModelViewerState extends State<ModelViewer> {
         case '/':
         case '/index.html':
           final htmlTemplate = await rootBundle
-              .loadString(
-              'packages/model_viewer_plus/etc/assets/template.html');
+              .loadString('packages/model_viewer_plus/etc/assets/template.html');
           final html = utf8.encode(_buildHTML(htmlTemplate));
           response
             ..statusCode = HttpStatus.ok
@@ -152,6 +153,18 @@ class ModelViewerState extends State<ModelViewer> {
           await response.close();
           break;
 
+        case '/external-list.js':
+          final code = await _readAsset(
+              'packages/model_viewer_plus/etc/assets/external-list.js');
+          response
+            ..statusCode = HttpStatus.ok
+            ..headers
+                .add("Content-Type", "application/javascript;charset=UTF-8")
+            ..headers.add("Content-Length", code.lengthInBytes.toString())
+            ..add(code);
+          await response.close();
+          break;
+
         case '/variant-list.js':
           final code = await _readAsset(
               'packages/model_viewer_plus/etc/assets/variant-list.js');
@@ -159,6 +172,30 @@ class ModelViewerState extends State<ModelViewer> {
             ..statusCode = HttpStatus.ok
             ..headers
                 .add("Content-Type", "application/javascript;charset=UTF-8")
+            ..headers.add("Content-Length", code.lengthInBytes.toString())
+            ..add(code);
+          await response.close();
+          break;
+
+        case '/panningScript.js':
+          final code = await _readAsset(
+              'packages/model_viewer_plus/etc/assets/panningScript.js');
+          response
+            ..statusCode = HttpStatus.ok
+            ..headers
+                .add("Content-Type", "application/javascript;charset=UTF-8")
+            ..headers.add("Content-Length", code.lengthInBytes.toString())
+            ..add(code);
+          await response.close();
+          break;
+
+        case '/additionalTextures.json':
+          final code = await _readAsset(
+              'packages/model_viewer_plus/etc/assets/additionalTextures.json');
+          response
+            ..statusCode = HttpStatus.ok
+            ..headers
+                .add("Content-Type", "application/json;charset=UTF-8")
             ..headers.add("Content-Length", code.lengthInBytes.toString())
             ..add(code);
           await response.close();
@@ -183,13 +220,37 @@ class ModelViewerState extends State<ModelViewer> {
 
         case '/favicon.ico':
         default:
-          final text = utf8.encode("Resource '${request.uri}' not found");
-          response
-            ..statusCode = HttpStatus.notFound
-            ..headers.add("Content-Type", "text/plain;charset=UTF-8")
-            ..headers.add("Content-Length", text.length.toString())
-            ..add(text);
-          await response.close();
+          var defaultURL = request.uri.toString();
+          if(defaultURL.contains("textures/")){
+            var stringPos = defaultURL.lastIndexOf('/');
+            var result = (stringPos != -1)? defaultURL.substring((stringPos + 1), defaultURL.length): defaultURL;
+            var pos = int.parse(result);
+            var textureURL = widget.textures[pos].path;
+            var textureURI = Uri.parse(textureURL);
+
+            if (textureURI.isAbsolute && !textureURI.isScheme("file")) {
+              await response.redirect(textureURI); // TODO: proxy the resource
+            } else {
+              final data = await (textureURI.isScheme("file")
+                  ? _readFile(textureURI.path)
+                  : _readAsset(textureURI.path));
+              response
+                ..statusCode = HttpStatus.ok
+                ..headers.add("Content-Type", "image/png")
+                ..headers.add("Content-Length", data.lengthInBytes.toString())
+                ..headers.add("Access-Control-Allow-Origin", "*")
+                ..add(data);
+              await response.close();
+            }
+          }else{
+            final text = utf8.encode("Resource '${request.uri}' not found");
+            response
+              ..statusCode = HttpStatus.notFound
+              ..headers.add("Content-Type", "text/plain;charset=UTF-8")
+              ..headers.add("Content-Length", text.length.toString())
+              ..add(text);
+            await response.close();
+          }
           break;
       }
     });
