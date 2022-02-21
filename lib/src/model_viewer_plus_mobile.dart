@@ -19,6 +19,7 @@ import 'model_viewer_plus.dart';
 class ModelViewerState extends State<ModelViewer> {
   final Completer<WebViewController> _controller =
   Completer<WebViewController>();
+  late WebViewController controller;
 
   HttpServer? _proxy;
 
@@ -50,6 +51,7 @@ class ModelViewerState extends State<ModelViewer> {
       javascriptMode: JavascriptMode.unrestricted,
       initialMediaPlaybackPolicy: AutoMediaPlaybackPolicy.always_allow,
       onWebViewCreated: (final WebViewController webViewController) async {
+        controller = webViewController;
         _controller.complete(webViewController);
         final host = _proxy!.address.address;
         final port = _proxy!.port;
@@ -87,6 +89,7 @@ class ModelViewerState extends State<ModelViewer> {
         //print('>>>> ModelViewer began loading: <$url>'); // DEBUG
       },
       onPageFinished: (final String url) {
+        controller.evaluateJavascript('document.body.style.overflow = \'hidden\';');
         //print('>>>> ModelViewer finished loading: <$url>'); // DEBUG
       },
       onWebResourceError: (final WebResourceError error) {

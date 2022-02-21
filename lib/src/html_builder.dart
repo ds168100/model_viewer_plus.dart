@@ -79,7 +79,7 @@ abstract class HTMLBuilder {
     // TODO: shadow-softness
 
     html.writeln('></model-viewer>');
-    html.write('<section>');
+    html.write('<center><section>');
     //html.write('><section>');
     //html.write(' <center><b>Inspection Type:</b> <select id="variant"></select></center>');
     html.write('<center><select id="variant">');
@@ -89,7 +89,7 @@ abstract class HTMLBuilder {
       html.write(newOption);
     }
     html.write('</select></center>');
-    html.write('</section>');
+    html.write('</section></center>');
     //html.writeln('</model-viewer>');
 
     return html.toString();
