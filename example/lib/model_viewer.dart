@@ -30,6 +30,12 @@ class _ModelViewPageState extends State<ModelViewPage>{
     testTextures.add(TextureVariants(name: "Street", path: "etc/assets/textures/diffuseStreet.jpg"));
     testTextures.add(TextureVariants(name: "Trippy", path: "etc/assets/textures/occlusionRougnessMetalness.jpg"));
 
+    testTextures.add(TextureVariants(name: "Lines 2", path: "etc/assets/textures/splash_background.jpg"));
+    testTextures.add(TextureVariants(name: "Beach 2", path: "etc/assets/textures/diffuseBeach.jpg"));
+    testTextures.add(TextureVariants(name: "Midnight 2", path: "etc/assets/textures/diffuseMidnight.jpg"));
+    testTextures.add(TextureVariants(name: "Street 2", path: "etc/assets/textures/diffuseStreet.jpg"));
+    testTextures.add(TextureVariants(name: "Trippy 2", path: "etc/assets/textures/occlusionRougnessMetalness.jpg"));
+
     return Scaffold(
       appBar: AppBar(title: Text("Model Viewer")),
       body: ModelViewer(

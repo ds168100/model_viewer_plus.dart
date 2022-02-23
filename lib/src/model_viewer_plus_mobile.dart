@@ -7,6 +7,7 @@ import 'dart:io'
 import 'dart:typed_data' show Uint8List;
 
 import 'package:android_intent_plus/flag.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:android_intent_plus/android_intent.dart' as android_content;
@@ -105,6 +106,19 @@ class ModelViewerState extends State<ModelViewer> {
     );
   }
 
+  Future<IconData> determineFileStatusIcon(String pathToFile) async{
+    var fileToCheck = File(pathToFile);
+    if(fileToCheck.existsSync() || pathToFile.contains("assets/")){
+      return Icons.download_done_outlined;
+    }else{
+      return Icons.cloud;
+    }
+  }
+
+  Future<IconData> defaultIcon() async{
+    return Icons.download_done_outlined;
+  }
+
   Widget createCard(int index, BuildContext context) {
     Widget cardToReturn = Card(
         child: ListTile(onTap: () async {
@@ -120,14 +134,14 @@ class ModelViewerState extends State<ModelViewer> {
           await pc.close();
           },
           title: Text((index == 0) ? ("Default") : (widget.textures[index - 1].name)),
-          /*
+
           trailing: FutureBuilder<IconData>(
-              future: local_file_handler.determineIndicatorIcon(_textureListToShow[index].path),
+              future: (index == 0) ? defaultIcon() : determineFileStatusIcon(widget.textures[index-1].path),
               builder:
                   (BuildContext context, AsyncSnapshot<IconData> snapshot) {
                 return Icon(snapshot.data);
               }),
-           */
+
         ),
       );
     return cardToReturn;
@@ -188,7 +202,35 @@ class ModelViewerState extends State<ModelViewer> {
             topLeft: Radius.circular(24.0), topRight: Radius.circular(24.0)),
       ),
       //margin: const EdgeInsets.fromLTRB(24.0, 24.0, 24.0, 0.0),
-      child: Center(child: Text("Swipe up for textures")),
+      child: Column(
+        children: [
+          Spacer(),
+          Row(
+            children: [
+              Spacer(),
+              /*
+              IconButton(onPressed: () => controller.runJavascript("increaseScale()"), icon: Icon(Icons.zoom_in, color: Colors.white,)),
+              IconButton(onPressed: () => controller.runJavascript("decreaseScale()"), icon: Icon(Icons.zoom_out, color: Colors.white)),
+              IconButton(onPressed: () => controller.runJavascript("decreaseYaw()"), icon: Icon(CupertinoIcons.arrow_turn_down_left)),
+              IconButton(onPressed: () => controller.runJavascript("increaseYaw()"), icon: Icon(CupertinoIcons.arrow_turn_down_right)),
+               */
+
+              TextButton(onPressed: () => controller.runJavascript("decreaseYaw()"), child: Text("X-", style: TextStyle(fontSize: 20, color: Colors.white),),),
+              TextButton(onPressed: () => controller.runJavascript("increaseYaw()"), child: Text("X+", style: TextStyle(fontSize: 20, color: Colors.white),),),
+              TextButton(onPressed: () => controller.runJavascript("decreasePitch()"), child: Text("Y-", style: TextStyle(fontSize: 20, color: Colors.white),),),
+              TextButton(onPressed: () => controller.runJavascript("increasePitch()"), child: Text("Y+", style: TextStyle(fontSize: 20, color: Colors.white),),),
+              TextButton(onPressed: () => controller.runJavascript("decreaseRoll()"), child: Text("Z-", style: TextStyle(fontSize: 20, color: Colors.white),),),
+              TextButton(onPressed: () => controller.runJavascript("increaseRoll()"), child: Text("Z+", style: TextStyle(fontSize: 20, color: Colors.white),),),
+              Spacer(),
+            ],
+          ),
+          Text("▲ Swipe up for texture selection ▲",
+            style: TextStyle(
+              color: Colors.white,
+            ),),
+          Spacer(),
+        ],
+      ),
     );
   }
 
@@ -237,104 +279,6 @@ class ModelViewerState extends State<ModelViewer> {
     }
     return items;
   }
-
-  /*
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: <Widget>[
-        // The containers in the background
-        Column(
-          children: <Widget>[
-            Container(
-              height: MediaQuery.of(context).size.height - 110,
-              color: Colors.blue,
-              child: WebView(
-                initialUrl: null,
-                javascriptMode: JavascriptMode.unrestricted,
-                initialMediaPlaybackPolicy: AutoMediaPlaybackPolicy.always_allow,
-                onWebViewCreated: (final WebViewController webViewController) async {
-                  controller = webViewController;
-                  _controller.complete(webViewController);
-                  final host = _proxy!.address.address;
-                  final port = _proxy!.port;
-                  final url = "http://$host:$port/";
-                  print('>>>> ModelViewer initializing... <$url>'); // DEBUG
-                  await webViewController.loadUrl(url);
-                },
-                navigationDelegate: (final NavigationRequest navigation) async {
-                  //print('>>>> ModelViewer wants to load: <${navigation.url}>'); // DEBUG
-                  if (!Platform.isAndroid) {
-                    return NavigationDecision.navigate;
-                  }
-                  if (!navigation.url.startsWith("intent://")) {
-                    return NavigationDecision.navigate;
-                  }
-                  try {
-                    // See: https://developers.google.com/ar/develop/java/scene-viewer
-                    final intent = android_content.AndroidIntent(
-                      action: "android.intent.action.VIEW", // Intent.ACTION_VIEW
-                      data: "https://arvr.google.com/scene-viewer/1.0",
-                      arguments:  <String, dynamic>{
-                        'file': widget.src,
-                        'mode': 'ar_only',
-                      },
-                      package: "com.google.ar.core",
-                      flags: <int>[Flag.FLAG_ACTIVITY_NEW_TASK],// Intent.FLAG_ACTIVITY_NEW_TASK,
-                    );
-                    await intent.launch();
-                  } catch (error) {
-                    print('>>>> ModelViewer failed to launch AR: $error'); // DEBUG
-                  }
-                  return NavigationDecision.prevent;
-                },
-                onPageStarted: (final String url) {
-                  //print('>>>> ModelViewer began loading: <$url>'); // DEBUG
-                },
-                onPageFinished: (final String url) {
-                  controller.evaluateJavascript('document.body.style.overflow = \'hidden\';');
-                  //print('>>>> ModelViewer finished loading: <$url>'); // DEBUG
-                },
-                onWebResourceError: (final WebResourceError error) {
-                  print(
-                      '>>>> ModelViewer failed to load: ${error.description} (${error.errorType} ${error.errorCode})'); // DEBUG
-                },
-              ),
-            ),
-          ],
-        ),
-        // The card widget with top padding,
-        // incase if you wanted bottom padding to work,
-        // set the `alignment` of container to Alignment.bottomCenter
-        Container(
-          alignment: Alignment.topCenter,
-          padding: EdgeInsets.only(
-              top: MediaQuery.of(context).size.height * .75,
-              right: 0.0,
-              left: 0.0),
-          child: Container(
-            height: 200.0,
-            width: MediaQuery.of(context).size.width,
-            child: Card(
-              child: Center(
-                  child: DropdownButton<String>(
-                    onChanged: (value) {
-                      var jsCommand = "changeTexture('${value}')";
-                      controller.runJavascript(jsCommand);
-                      },
-                    items: generateDropdownItems(),
-                  ),
-              ),
-              color: Theme.of(context).scaffoldBackgroundColor,
-              //color: Colors.black,
-              elevation: 4.0,
-            ),
-          ),
-        )
-      ],
-    );
-  }
-   */
 
   String _buildHTML(final String htmlTemplate) {
     var textureNames = <String>[];
@@ -408,6 +352,18 @@ class ModelViewerState extends State<ModelViewer> {
         case '/variant-list.js':
           final code = await _readAsset(
               'packages/model_viewer_plus/etc/assets/variant-list.js');
+          response
+            ..statusCode = HttpStatus.ok
+            ..headers
+                .add("Content-Type", "application/javascript;charset=UTF-8")
+            ..headers.add("Content-Length", code.lengthInBytes.toString())
+            ..add(code);
+          await response.close();
+          break;
+
+        case '/model-manipulation.js':
+          final code = await _readAsset(
+              'packages/model_viewer_plus/etc/assets/model-manipulation.js');
           response
             ..statusCode = HttpStatus.ok
             ..headers

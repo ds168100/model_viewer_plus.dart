@@ -30,3 +30,4 @@ flutter:
     - etc/assets/variant-list.js
     - etc/assets/external-list.js
     - etc/assets/panningScript.js
+    - etc/assets/model-manipulation.js
