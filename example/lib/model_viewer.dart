@@ -44,7 +44,7 @@ class _ModelViewPageState extends State<ModelViewPage>{
       ar: false,
       autoRotate: false,
       cameraControls: true,
-      textures: testTextures,
+      //textures: testTextures,
     );
 
 

@@ -107,10 +107,13 @@ class ModelViewerState extends State<ModelViewer> {
   }
 
   String _buildHTML(final String htmlTemplate) {
+    /*
     var textureNames = <String>[];
     for (var element in widget.textures) {
       textureNames.add(element.name);
     }
+
+     */
     return HTMLBuilder.build(
       htmlTemplate: htmlTemplate,
       backgroundColor: widget.backgroundColor,
@@ -123,7 +126,7 @@ class ModelViewerState extends State<ModelViewer> {
       autoRotateDelay: widget.autoRotateDelay,
       autoPlay: widget.autoPlay,
       cameraControls: widget.cameraControls,
-      textures: textureNames,
+      //textures: textureNames,
       iosSrc: widget.iosSrc,
     );
   }

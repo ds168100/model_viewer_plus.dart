@@ -41,7 +41,7 @@ class ModelViewer extends StatefulWidget {
       this.cameraControls,
       this.iosSrc,
       this.webController,
-      required this.textures,
+      //required this.textures,
       })
       : super(key: key);
 
@@ -99,7 +99,7 @@ class ModelViewer extends StatefulWidget {
   /// via AR Quick Look.
   final String? iosSrc;
 
-  final List<TextureVariants> textures;
+  //final List<TextureVariants> textures;
 
   late WebViewController? webController;
 
