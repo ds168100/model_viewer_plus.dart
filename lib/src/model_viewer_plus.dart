@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 import 'model_viewer_plus_stub.dart'
     if (dart.library.io) 'model_viewer_plus_mobile.dart'
@@ -39,6 +40,7 @@ class ModelViewer extends StatefulWidget {
       this.autoPlay,
       this.cameraControls,
       this.iosSrc,
+      this.webController,
       required this.textures,
       })
       : super(key: key);
@@ -98,6 +100,8 @@ class ModelViewer extends StatefulWidget {
   final String? iosSrc;
 
   final List<TextureVariants> textures;
+
+  late WebViewController? webController;
 
   @override
   State<ModelViewer> createState() => ModelViewerState();

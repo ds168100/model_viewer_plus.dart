@@ -11,7 +11,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:android_intent_plus/android_intent.dart' as android_content;
-import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import 'html_builder.dart';
@@ -23,7 +22,7 @@ class ModelViewerState extends State<ModelViewer> {
       Completer<WebViewController>();
   late WebViewController controller;
   String dropDownText = "Default";
-  PanelController pc = PanelController();
+
 
   HttpServer? _proxy;
 
@@ -55,6 +54,7 @@ class ModelViewerState extends State<ModelViewer> {
       initialMediaPlaybackPolicy: AutoMediaPlaybackPolicy.always_allow,
       onWebViewCreated: (final WebViewController webViewController) async {
         controller = webViewController;
+        widget.webController = controller;
         _controller.complete(webViewController);
         final host = _proxy!.address.address;
         final port = _proxy!.port;
@@ -106,180 +106,6 @@ class ModelViewerState extends State<ModelViewer> {
     );
   }
 
-  Future<IconData> determineFileStatusIcon(String pathToFile) async{
-    var fileToCheck = File(pathToFile);
-    if(fileToCheck.existsSync() || pathToFile.contains("assets/")){
-      return Icons.download_done_outlined;
-    }else{
-      return Icons.cloud;
-    }
-  }
-
-  Future<IconData> defaultIcon() async{
-    return Icons.download_done_outlined;
-  }
-
-  Widget createCard(int index, BuildContext context) {
-    Widget cardToReturn = Card(
-        child: ListTile(onTap: () async {
-          var textureCommandSwitch = '';
-          if(index == 0){
-            textureCommandSwitch = 'Default';
-          }else{
-            textureCommandSwitch = 'textures/${(index - 1)}';
-          }
-          var jsCommand = "changeTexture('${textureCommandSwitch}')";
-          print(jsCommand);
-          await controller.runJavascript(jsCommand);
-          await pc.close();
-          },
-          title: Text((index == 0) ? ("Default") : (widget.textures[index - 1].name)),
-
-          trailing: FutureBuilder<IconData>(
-              future: (index == 0) ? defaultIcon() : determineFileStatusIcon(widget.textures[index-1].path),
-              builder:
-                  (BuildContext context, AsyncSnapshot<IconData> snapshot) {
-                return Icon(snapshot.data);
-              }),
-
-        ),
-      );
-    return cardToReturn;
-  }
-
-
-  Widget _scrollingList(ScrollController sc, BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.only(bottom: 5),
-      decoration: BoxDecoration(
-        color: Theme.of(context).canvasColor,
-        borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(24.0), topRight: Radius.circular(24.0)),
-      ),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const SizedBox(
-                height: 100,
-              ),
-              Align(
-                alignment: Alignment.center,
-                // Align however you like (i.e .centerRight, centerLeft)
-                child: Text("Textures"),
-                ),
-            ],
-          ),
-         Expanded(
-           child: Container(
-             color: Theme.of(context).canvasColor,
-             child: Stack(
-               children: [
-                 ListView.builder(
-                   controller: sc,
-                   itemCount: (widget.textures.length + 1),
-                   itemBuilder: (BuildContext context, int i) {
-                     //return getSingleTextureCard(_textureListToShow[i], modelToShow, currentScene, context);
-                     return createCard(i, context);
-                   },
-                 ),
-               ],
-             ),
-           ),
-         ),
-        ],
-      ),
-    );
-  }
-
-  Widget _collapsed(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Theme.of(context).primaryColor,
-        borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(24.0), topRight: Radius.circular(24.0)),
-      ),
-      //margin: const EdgeInsets.fromLTRB(24.0, 24.0, 24.0, 0.0),
-      child: Column(
-        children: [
-          Spacer(),
-          Row(
-            children: [
-              Spacer(),
-              /*
-              IconButton(onPressed: () => controller.runJavascript("increaseScale()"), icon: Icon(Icons.zoom_in, color: Colors.white,)),
-              IconButton(onPressed: () => controller.runJavascript("decreaseScale()"), icon: Icon(Icons.zoom_out, color: Colors.white)),
-              IconButton(onPressed: () => controller.runJavascript("decreaseYaw()"), icon: Icon(CupertinoIcons.arrow_turn_down_left)),
-              IconButton(onPressed: () => controller.runJavascript("increaseYaw()"), icon: Icon(CupertinoIcons.arrow_turn_down_right)),
-               */
-
-              TextButton(onPressed: () => controller.runJavascript("decreaseYaw()"), child: Text("X-", style: TextStyle(fontSize: 20, color: Colors.white),),),
-              TextButton(onPressed: () => controller.runJavascript("increaseYaw()"), child: Text("X+", style: TextStyle(fontSize: 20, color: Colors.white),),),
-              TextButton(onPressed: () => controller.runJavascript("decreasePitch()"), child: Text("Y-", style: TextStyle(fontSize: 20, color: Colors.white),),),
-              TextButton(onPressed: () => controller.runJavascript("increasePitch()"), child: Text("Y+", style: TextStyle(fontSize: 20, color: Colors.white),),),
-              TextButton(onPressed: () => controller.runJavascript("decreaseRoll()"), child: Text("Z-", style: TextStyle(fontSize: 20, color: Colors.white),),),
-              TextButton(onPressed: () => controller.runJavascript("increaseRoll()"), child: Text("Z+", style: TextStyle(fontSize: 20, color: Colors.white),),),
-              Spacer(),
-            ],
-          ),
-          Text("▲ Swipe up for texture selection ▲",
-            style: TextStyle(
-              color: Colors.white,
-            ),),
-          Spacer(),
-        ],
-      ),
-    );
-  }
-
-
-
-  @override
-  Widget build(final BuildContext context) {
-    return Container(
-      child: SlidingUpPanel(
-        renderPanelSheet: false,
-        controller: pc,
-        backdropEnabled: true,
-        panelBuilder: (ScrollController sc) => _scrollingList(sc, context),
-        collapsed: _collapsed(context),
-        body: Container(
-          //color: ui_colors.determineAppBarColor(context),
-          child: SafeArea(
-            child: Stack(
-              children: [
-                Container(
-                  color: Theme.of(context).canvasColor,
-                  child: createWebView(),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  List<DropdownMenuItem<String>> generateDropdownItems() {
-    var items = <DropdownMenuItem<String>>[];
-    var defaultMenu = DropdownMenuItem<String>(
-      child: Text('Default'),
-      value: "Default",
-    );
-    items.add(defaultMenu);
-
-    for (var i = 0; i < widget.textures.length; i++) {
-      var item = DropdownMenuItem<String>(
-        child: Text(widget.textures[i].name),
-        value: 'textures/${i}',
-      );
-      items.add(item);
-    }
-    return items;
-  }
-
   String _buildHTML(final String htmlTemplate) {
     var textureNames = <String>[];
     for (var element in widget.textures) {
@@ -299,6 +125,14 @@ class ModelViewerState extends State<ModelViewer> {
       cameraControls: widget.cameraControls,
       textures: textureNames,
       iosSrc: widget.iosSrc,
+    );
+  }
+
+  @override
+  Widget build(final BuildContext context) {
+    return Container(
+      color: Theme.of(context).canvasColor,
+      child: createWebView(),
     );
   }
 
@@ -385,17 +219,6 @@ class ModelViewerState extends State<ModelViewer> {
           await response.close();
           break;
 
-        case '/additionalTextures.json':
-          final code = await _readAsset(
-              'packages/model_viewer_plus/etc/assets/additionalTextures.json');
-          response
-            ..statusCode = HttpStatus.ok
-            ..headers.add("Content-Type", "application/json;charset=UTF-8")
-            ..headers.add("Content-Length", code.lengthInBytes.toString())
-            ..add(code);
-          await response.close();
-          break;
-
         case '/model':
           if (url.isAbsolute && !url.isScheme("file")) {
             await response.redirect(url); // TODO: proxy the resource
@@ -414,15 +237,18 @@ class ModelViewerState extends State<ModelViewer> {
           break;
 
         case '/favicon.ico':
+
         default:
           var defaultURL = request.uri.toString();
           if (defaultURL.contains("textures/")) {
-            var stringPos = defaultURL.lastIndexOf('/');
-            var result = (stringPos != -1)
-                ? defaultURL.substring((stringPos + 1), defaultURL.length)
-                : defaultURL;
-            var pos = int.parse(result);
-            var textureURL = widget.textures[pos].path;
+            var dateParts = defaultURL.split("/");
+            var textureURL = '';
+            for(var i = 2; i<dateParts.length; i++){
+              textureURL += dateParts[i];
+              if(i < (dateParts.length - 1)){
+                textureURL += '/';
+              }
+            }
             var textureURI = Uri.parse(textureURL);
 
             if (textureURI.isAbsolute && !textureURI.isScheme("file")) {
