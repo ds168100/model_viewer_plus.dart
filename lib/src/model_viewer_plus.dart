@@ -1,26 +1,29 @@
 import 'package:flutter/material.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 
 import 'model_viewer_plus_stub.dart'
-    if (dart.library.io) 'model_viewer_plus_mobile.dart'
-    if (dart.library.js) 'model_viewer_plus_web.dart';
+if (dart.library.io) 'model_viewer_plus_mobile.dart'
+if (dart.library.js) 'model_viewer_plus_web.dart';
 
 class TextureVariants{
   TextureVariants({
     this.name = "Texutre Name",
     this.path = "Path to texture",
+    this.serverPath = "serverPath",
   });
   String name;
   String path;
+  String serverPath;
 
   factory TextureVariants.fromJson(Map<String, dynamic> json) => TextureVariants(
     name: json["name"],
     path: json["path"],
+    serverPath: json["serverPath"],
   );
 
   Map<String, dynamic> toJson() => {
     "name": name,
-    "path": path
+    "path": path,
+    "serverPath": serverPath,
   };
 }
 
@@ -29,19 +32,18 @@ class TextureVariants{
 class ModelViewer extends StatefulWidget {
   ModelViewer(
       {Key? key,
-      this.backgroundColor = Colors.white,
-      required this.src,
-      this.alt,
-      this.ar,
-      this.arModes,
-      this.arScale,
-      this.autoRotate,
-      this.autoRotateDelay,
-      this.autoPlay,
-      this.cameraControls,
-      this.iosSrc,
-      this.webController,
-      //required this.textures,
+        this.backgroundColor = Colors.white,
+        required this.src,
+        this.alt,
+        this.ar,
+        this.arModes,
+        this.arScale,
+        this.autoRotate,
+        this.autoRotateDelay,
+        this.autoPlay,
+        this.cameraControls,
+        this.iosSrc,
+        required this.textures,
       })
       : super(key: key);
 
@@ -99,9 +101,7 @@ class ModelViewer extends StatefulWidget {
   /// via AR Quick Look.
   final String? iosSrc;
 
-  //final List<TextureVariants> textures;
-
-  late WebViewController? webController;
+  final List<TextureVariants> textures;
 
   @override
   State<ModelViewer> createState() => ModelViewerState();
