@@ -1,6 +1,7 @@
 /* This is free and unencumbered software released into the public domain. */
 
 import 'package:flutter/material.dart';
+import 'package:model_viewer_plus/model_viewer_plus.dart';
 import 'package:model_viewer_plus_example/list_view_home.dart';
 
 void main() => runApp(MyApp());
@@ -26,7 +27,7 @@ class MyApp extends StatelessWidget {
           cameraControls: true,
           iosSrc: 'https://modelviewer.dev/shared-assets/models/Astronaut.usdz',
         ),
-        home: MyHomePage()
+    )
     );
   }
 }

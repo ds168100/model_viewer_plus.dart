@@ -184,15 +184,7 @@ class ModelViewerState extends State<ModelViewer> {
       iosSrc: widget.iosSrc,
     );
   }
-
-  @override
-  Widget build(final BuildContext context) {
-    return Container(
-      color: Theme.of(context).canvasColor,
-      child: createWebView(),
-    );
-  }
-
+  
   Future<void> _initProxy() async {
     final url = Uri.parse(widget.src);
 
