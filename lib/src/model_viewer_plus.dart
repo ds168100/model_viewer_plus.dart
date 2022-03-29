@@ -51,7 +51,7 @@ class ModelViewer extends StatefulWidget {
 
   /// The background color for the model viewer.
   ///
-  /// The theme's [ThemeData.scaffoldBackgroundColor] by default.
+  /// [Colors.transparent] by default.
   final Color backgroundColor;
 
   /// The URL or path to the 3D model. This parameter is required.

@@ -13,10 +13,18 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        title: 'Flutter Demo',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-          visualDensity: VisualDensity.adaptivePlatformDensity,
+      home: Scaffold(
+        appBar: AppBar(title: Text("Model Viewer")),
+        body: ModelViewer(
+          backgroundColor: Color.fromARGB(0xFF, 0xEE, 0xEE, 0xEE),
+          // src: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb',
+          src: 'assets/Astronaut.glb', // a bundled asset file
+          alt: "A 3D model of an astronaut",
+          ar: true,
+          arModes: ['scene-viewer', 'webxr', 'quick-look'],
+          autoRotate: true,
+          cameraControls: true,
+          iosSrc: 'https://modelviewer.dev/shared-assets/models/Astronaut.usdz',
         ),
         home: MyHomePage()
     );

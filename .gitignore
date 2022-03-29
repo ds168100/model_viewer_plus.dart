@@ -12,5 +12,7 @@
 .packages
 build/
 pubspec.lock
+.flutter-plugins
+.flutter-plugins-dependencies
 
 example/assets/EC_Pipes.gltf
