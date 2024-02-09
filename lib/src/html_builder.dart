@@ -366,7 +366,7 @@ abstract class HTMLBuilder {
       }
       modelViewerHtml.write('max-hotspot-opacity: $maxHotspotOpacity; ');
     }
-    modelViewerHtml..write('"') // close style
+    modelViewerHtml..write('"'); // close style
 
     /*
     if (id != null) {
