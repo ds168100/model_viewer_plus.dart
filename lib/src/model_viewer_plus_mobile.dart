@@ -290,7 +290,33 @@ class ModelViewerState extends State<ModelViewer> {
             ..add(text);
           await response.close();
         default:
-          if (request.uri.isAbsolute) {
+          var defaultURL = request.uri.toString();
+          if (defaultURL.contains("textures/")) {
+            var dateParts = defaultURL.split("/");
+            var textureURL = '';
+            for(var i = 2; i<dateParts.length; i++){
+              textureURL += dateParts[i];
+              if(i < (dateParts.length - 1)){
+                textureURL += '/';
+              }
+            }
+            var textureURI = Uri.parse(textureURL);
+
+            if (textureURI.isAbsolute && !textureURI.isScheme("file")) {
+              await response.redirect(textureURI); // TODO: proxy the resource
+            } else {
+              final data = await (textureURI.isScheme("file")
+                  ? _readFile(textureURI.path)
+                  : _readAsset(textureURI.path));
+              response
+                ..statusCode = HttpStatus.ok
+                ..headers.add("Content-Type", "image/png")
+                ..headers.add("Content-Length", data.lengthInBytes.toString())
+                ..headers.add("Access-Control-Allow-Origin", "*")
+                ..add(data);
+              await response.close();
+            }
+          }else if (request.uri.isAbsolute) {
             debugPrint('Redirect: ${request.uri}');
             await response.redirect(request.uri);
           } else if (request.uri.hasAbsolutePath) {

@@ -80,7 +80,7 @@ abstract class HTMLBuilder {
     }
 
     final modelViewerHtml = StringBuffer()
-      ..write('<model-viewer')
+      ..write('<model-viewer id="model"')
       // Attributes
       // Loading Attributes
       // src
@@ -374,9 +374,6 @@ abstract class HTMLBuilder {
     }
      */
 
-    ..write(' id="model"')
-
-    ..writeln('>'); // close the previous tag of omodel-viewer
     if (innerModelViewerHtml != null) {
       modelViewerHtml.writeln(innerModelViewerHtml);
     }

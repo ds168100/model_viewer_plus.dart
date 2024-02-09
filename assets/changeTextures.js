@@ -3,6 +3,7 @@ let saveTexture;
 let input;
 
       const createAndApplyTexture = async (channel, file) => {
+      Print.postMessage("In createAndApplyTexture!");
         const texture = await modelViewerTexture.createTexture(file);
         if (channel.includes('base') || channel.includes('metallic')) {
           material.pbrMetallicRoughness[channel].setTexture(texture);
@@ -21,7 +22,7 @@ let input;
       }
 
 const modelViewerTexture = document.querySelector("model-viewer#model");
-        console.log("Found MODEl VIEWER!");
+        Print.postMessage("Found MODEl VIEWER!");
      modelViewerTexture.addEventListener("load", () => {
      material = modelViewerTexture.model.materials[0];
      saveTexture = material.pbrMetallicRoughness['baseColorTexture'].texture;
