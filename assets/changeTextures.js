@@ -12,7 +12,7 @@ let input;
       }
 
       function changeTexture(changeValue){
-      console.log("In Change Texture");
+      Print.postMessage("In Change Texture!");
       if(changeValue.includes('Default')){
         material.pbrMetallicRoughness['baseColorTexture'].setTexture(saveTexture);
       }else{

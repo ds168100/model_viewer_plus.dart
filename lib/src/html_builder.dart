@@ -366,13 +366,17 @@ abstract class HTMLBuilder {
       }
       modelViewerHtml.write('max-hotspot-opacity: $maxHotspotOpacity; ');
     }
-    modelViewerHtml.write('"'); // close style
+    modelViewerHtml..write('"') // close style
 
+    /*
     if (id != null) {
       modelViewerHtml.write(' id="${htmlEscape.convert(id)}"');
     }
+     */
 
-    modelViewerHtml.writeln('>'); // close the previous tag of omodel-viewer
+    ..write(' id="model"')
+
+    ..writeln('>'); // close the previous tag of omodel-viewer
     if (innerModelViewerHtml != null) {
       modelViewerHtml.writeln(innerModelViewerHtml);
     }

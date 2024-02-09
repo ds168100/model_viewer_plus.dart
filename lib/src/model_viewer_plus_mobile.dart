@@ -255,6 +255,17 @@ class ModelViewerState extends State<ModelViewer> {
             ..headers.add('Content-Length', code.lengthInBytes.toString())
             ..add(code);
           await response.close();
+        case '/changeTextures.js':
+          final code = await _readAsset(
+            'packages/model_viewer_plus/assets/changeTextures.js',
+          );
+          response
+            ..statusCode = HttpStatus.ok
+            ..headers
+                .add('Content-Type', 'application/javascript;charset=UTF-8')
+            ..headers.add('Content-Length', code.lengthInBytes.toString())
+            ..add(code);
+          await response.close();
         case '/model':
           if (url.isAbsolute && !url.isScheme('file')) {
             await response.redirect(url);
