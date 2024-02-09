@@ -213,11 +213,10 @@ class ModelViewerState extends State<ModelViewer> {
       );
     });
 
-    await webViewController.addJavaScriptChannel(
-        'Print',
+    await webViewController.addJavaScriptChannel('Print',
         onMessageReceived: (message) {
-          print(message.message);
-        });
+      print(message.message);
+    });
 
     debugPrint('ModelViewer initializing... <$_proxyURL>');
     widget.onWebViewCreated?.call(webViewController);
@@ -300,9 +299,9 @@ class ModelViewerState extends State<ModelViewer> {
           if (defaultURL.contains("textures/")) {
             var dateParts = defaultURL.split("/");
             var textureURL = '';
-            for(var i = 2; i<dateParts.length; i++){
+            for (var i = 2; i < dateParts.length; i++) {
               textureURL += dateParts[i];
-              if(i < (dateParts.length - 1)){
+              if (i < (dateParts.length - 1)) {
                 textureURL += '/';
               }
             }
@@ -326,7 +325,7 @@ class ModelViewerState extends State<ModelViewer> {
                 ..add(data);
               await response.close();
             }
-          }else if (request.uri.isAbsolute) {
+          } else if (request.uri.isAbsolute) {
             debugPrint('Redirect: ${request.uri}');
             await response.redirect(request.uri);
           } else if (request.uri.hasAbsolutePath) {
