@@ -12,6 +12,7 @@ let input;
       }
 
       function changeTexture(changeValue){
+      console.log("In Change Texture");
       if(changeValue.includes('Default')){
         material.pbrMetallicRoughness['baseColorTexture'].setTexture(saveTexture);
       }else{
@@ -20,7 +21,8 @@ let input;
       }
 
 const modelViewerTexture = document.querySelector("model-viewer#model");
-    modelViewerTexture.addEventListener("load", () => {
+        console.log("Found MODEl VIEWER!");
+     modelViewerTexture.addEventListener("load", () => {
      material = modelViewerTexture.model.materials[0];
      saveTexture = material.pbrMetallicRoughness['baseColorTexture'].texture;
 
