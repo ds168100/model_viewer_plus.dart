@@ -213,6 +213,12 @@ class ModelViewerState extends State<ModelViewer> {
       );
     });
 
+    await webViewController.addJavaScriptChannel(
+        'Print',
+        onMessageReceived: (message) {
+          print(message.message);
+        });
+
     debugPrint('ModelViewer initializing... <$_proxyURL>');
     widget.onWebViewCreated?.call(webViewController);
     await webViewController.loadRequest(Uri.parse(_proxyURL));
@@ -300,6 +306,10 @@ class ModelViewerState extends State<ModelViewer> {
                 textureURL += '/';
               }
             }
+            //print("defaultURL:");
+            //print(defaultURL);
+            //print("TextureURL:");
+            //print(textureURL);
             var textureURI = Uri.parse(textureURL);
 
             if (textureURI.isAbsolute && !textureURI.isScheme("file")) {
